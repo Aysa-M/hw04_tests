@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Пост {{ title }}{% endblock %}
+{% block content %}
+  <div class="row">
+    <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <ul>
+            <li>
+              Автор: {{ post_profile.author.get_full_name }}
+            </li>
+            <li>
+              Дата публикации: {{ post_profile.pub_date|date:"d E Y" }}
+            </li>
+          </ul>      
+        {% if post_profile.group %}
+          <li class="list-group-item">
+            Группа: {{ post_profile.group }}
+            <a
+            href="{% url 'posts:group_list' slug=post_profile.group.slug %}"
+            target="_blank">все записи группы</a>
+          </li>
+        {% endif %}   
+          <li class="list-group-item">
+            Автор: {{ post_profile.author.get_full_name }}
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+          Всего постов автора:  <span >{{ post_profile.author.posts.count }}</span>
+        </li>
+        <li class="list-group-item">
+          <a href="{% url 'posts:profile' username=post_profile.author %}">
+            все посты пользователя
+          </a>
+        </li>
+      </ul>
+    </aside>
+    <article class="col-12 col-md-9">
+      <p>
+        {{ post_profile.text }}
+      </p>
+    </article>
+  </div> 
+{% endblock %}

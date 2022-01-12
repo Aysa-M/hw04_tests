@@ -1,0 +1,19 @@
+        <article>  
+          <ul>
+            <li>
+              Автор: {{ post.author.get_full_name }}
+            </li>
+            <li>
+              Дата публикации: {{ post.pub_date|date:"d E Y" }}
+            </li>
+          </ul>      
+          <p>
+            {{ post.text }}
+          </p>
+          {% if display_group_link and post.group %}
+            <a
+              href="{% url 'posts:group_list' slug=post.group.slug %}"
+              class="btn btn-primary"
+              target="_blank">все записи группы</a>
+          {% endif %}
+        </article>
