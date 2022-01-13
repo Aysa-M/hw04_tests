@@ -1,8 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.conf import settings
 
 User = get_user_model()
+abstract_post = settings.ABSTRACT_CREATED_POST_FOR_TESTS
+
 
 class UsersFormsTests(TestCase):
     @classmethod
@@ -34,6 +37,6 @@ class UsersFormsTests(TestCase):
             data=form_signup,
             follow=True)
         self.assertRedirects(response, reverse('posts:index'))
-        self.assertEqual(User.objects.count(), user_count+1)
+        self.assertEqual(User.objects.count(), user_count + abstract_post)
         self.assertTrue((
             User.objects.filter(username='VaPup').exists()))

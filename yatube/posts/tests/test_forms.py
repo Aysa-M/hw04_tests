@@ -2,12 +2,14 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.conf import settings
 
 from posts.forms import PostForm
 from posts.models import Post, Group
 
 User = get_user_model()
 CREATION_DATE = timezone.now()
+abstract_post = settings.ABSTRACT_CREATED_POST_FOR_TESTS
 
 
 class PostsFormsTests(TestCase):
@@ -50,7 +52,7 @@ class PostsFormsTests(TestCase):
             'group': self.group_second.pk,
             'author': self.author,
             'pub_date': CREATION_DATE,
-            }
+        }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
             data=form_data,
@@ -59,13 +61,15 @@ class PostsFormsTests(TestCase):
         self.assertRedirects(response, reverse(
             'posts:profile',
             kwargs={'username': self.author})
-            )
-        self.assertEqual(Post.objects.count(), post_count+1)
+        )
+        self.assertEqual(
+            Post.objects.count(),
+            post_count + abstract_post)
         self.assertTrue((
             Post.objects.filter(
                 text='Post in da home',
-                group=self.group_second)
-                ).exists())
+                group=self.group_second
+            )).exists())
 
     def test_form_posts_edit_post(self):
         """
@@ -86,13 +90,16 @@ class PostsFormsTests(TestCase):
                 kwargs={'post_id': '1'},
                 data=form_data_edit,
                 follow=True)
-            self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': '1'}))
+            self.assertRedirects(response, reverse(
+                'posts:post_detail',
+                kwargs={'post_id': '1'})
+            )
             self.assertEqual(Post.objects.count(), post_count)
             self.assertTrue((
                 Post.objects.filter(
                     text='Тестовая группа 2.',
-                    slug='test-slug-second')
-                    ).exists())
+                    slug='test-slug-second'
+                )).exists())
 
     def test_title_label(self):
         """Проверка labels полей формы."""
@@ -106,5 +113,5 @@ class PostsFormsTests(TestCase):
         text_help_texts = PostsFormsTests.form.fields['text'].help_text
         group_help_texts = PostsFormsTests.form.fields['group'].help_text
         self.assertTrue(text_help_texts, 'Текст нового поста')
-        self.assertTrue(group_help_texts, 'Группа, к которой будет относиться пост')
-            
+        self.assertTrue(
+            group_help_texts, 'Группа, к которой будет относиться пост')

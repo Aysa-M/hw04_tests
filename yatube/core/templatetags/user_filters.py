@@ -11,6 +11,7 @@ def addclass(field, css):
 
 def authorized_only(func):
     def check_user(request, *args, **kwargs):
+        """Проверка зарегистрирован ли пользователь на сайте."""
         if request.user.is_authenticated:
             return func(request, *args, **kwargs)
         else:

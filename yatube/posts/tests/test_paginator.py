@@ -8,6 +8,7 @@ User = get_user_model()
 FIRST_PAGE_COUNT = 10
 SECOND_PAGE_COUNT = 3
 
+
 class PaginatorViewsTest(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -28,12 +29,13 @@ class PaginatorViewsTest(TestCase):
         for i in range(1, 14):
             cls.objs.append((
                 Post(
-                pk=i,
-                author=cls.user,
-                group=cls.group,
-                text='Тестовая группа.')))
+                    pk=i,
+                    author=cls.user,
+                    group=cls.group,
+                    text='Тестовая группа.'
+                )))
         cls.post_obj = Post.objects.bulk_create(cls.objs)
-    
+
     def setUp(self) -> None:
         self.guest_client = Client()
         self.authorized_client = Client()
@@ -43,40 +45,53 @@ class PaginatorViewsTest(TestCase):
 
     def test_first_page_index_contains_ten_records(self):
         """
-        Проверка паджинатора - вывод десяти постов на первую страницу index.html.
+        Проверка паджинатора - вывод десяти постов на
+        первую страницу index.html.
         """
         if self.authorized_client:
-            response = self.authorized_client.get(reverse('posts:index'))
-            self.assertEqual(len(response.context['page_obj']), FIRST_PAGE_COUNT)
+            response = self.authorized_client.get(reverse(
+                'posts:index'))
+            self.assertEqual(
+                len(response.context['page_obj']), FIRST_PAGE_COUNT)
         else:
-            response = self.guest_client.get(reverse('posts:index'))
-            self.assertEqual(len(response.context['page_obj']), FIRST_PAGE_COUNT)
+            response = self.guest_client.get(
+                reverse('posts:index'))
+            self.assertEqual(
+                len(response.context['page_obj']), FIRST_PAGE_COUNT)
 
     def test_second_page_index_contains_three_records(self):
         """
-        Проверка паджинатора - вывод последних трех постов на вторую страницу index.html.
+        Проверка паджинатора - вывод последних трех постов на
+        вторую страницу index.html.
         """
         if self.authorized_client:
-            response = self.authorized_client.get(reverse('posts:index') + '?page=2')
-            self.assertEqual(len(response.context['page_obj']), SECOND_PAGE_COUNT)
+            response = self.authorized_client.get(
+                reverse('posts:index') + '?page=2')
+            self.assertEqual(
+                len(response.context['page_obj']), SECOND_PAGE_COUNT)
         else:
-            response = self.guest_client.get(reverse('posts:index') + '?page=2')
-            self.assertEqual(len(response.context['page_obj']), SECOND_PAGE_COUNT)
+            response = self.guest_client.get(
+                reverse('posts:index') + '?page=2')
+            self.assertEqual(
+                len(response.context['page_obj']), SECOND_PAGE_COUNT)
 
     def test_first_page_group_list_contains_ten_records(self):
         """
-        Проверка паджинатора - вывод десяти постов на первую страницу group_list.html.
+        Проверка паджинатора - вывод десяти постов на
+        первую страницу group_list.html.
         """
         if self.authorized_client:
             response = self.authorized_client.get(reverse(
                 'posts:group_list',
                 kwargs={'slug': 'test-slug'}))
-            self.assertEqual(len(response.context['page_obj']), FIRST_PAGE_COUNT)
+            self.assertEqual(
+                len(response.context['page_obj']), FIRST_PAGE_COUNT)
         else:
             response = self.guest_client.get(reverse(
                 'posts:group_list',
                 kwargs={'slug': 'test-slug'}))
-            self.assertEqual(len(response.context['page_obj']), FIRST_PAGE_COUNT)
+            self.assertEqual(
+                len(response.context['page_obj']), FIRST_PAGE_COUNT)
 
     def test_second_page_group_list_contains_three_records(self):
         """
@@ -87,28 +102,33 @@ class PaginatorViewsTest(TestCase):
             response = self.authorized_client.get((reverse(
                 'posts:group_list',
                 kwargs={'slug': 'test-slug'})) + '?page=2')
-            self.assertEqual(len(response.context['page_obj']), SECOND_PAGE_COUNT)
+            self.assertEqual(
+                len(response.context['page_obj']), SECOND_PAGE_COUNT)
         else:
             response = self.guest_client.get((reverse(
                 'posts:group_list',
                 kwargs={'slug': 'test-slug'})) + '?page=2')
-            self.assertEqual(len(response.context['page_obj']), SECOND_PAGE_COUNT)
+            self.assertEqual(
+                len(response.context['page_obj']), SECOND_PAGE_COUNT)
 
     def test_first_page_profile_contains_ten_records(self):
         """
-        Проверка паджинатора - вывод десяти постов на первую страницу profile.html.
+        Проверка паджинатора - вывод десяти постов на
+        первую страницу profile.html.
         """
         response = self.authorized_client.get(reverse(
             'posts:profile',
-            kwargs={'username':'auth'}))
-        self.assertEqual(len(response.context['page_obj']), FIRST_PAGE_COUNT)
+            kwargs={'username': 'auth'}))
+        self.assertEqual(
+            len(response.context['page_obj']), FIRST_PAGE_COUNT)
 
     def test_second_page_profile_contains_three_records(self):
         """
-        Проверка паджинатора - вывод последних трех постов на вторую страницу
-        group_list.html.
+        Проверка паджинатора - вывод последних трех постов на
+        вторую страницу group_list.html.
         """
         response = self.authorized_client.get((reverse(
             'posts:profile',
-            kwargs={'username':'auth'})) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), SECOND_PAGE_COUNT)
+            kwargs={'username': 'auth'})) + '?page=2')
+        self.assertEqual(
+            len(response.context['page_obj']), SECOND_PAGE_COUNT)

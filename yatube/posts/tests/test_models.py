@@ -21,7 +21,6 @@ class PostModelTest(TestCase):
             text='Тестовая группа',
         )
 
-
     def test_models_have_correct_object_names(self):
         """
         Проверяем корректность работы метода __str__
@@ -39,7 +38,7 @@ class PostModelTest(TestCase):
             with self.subTest(field=field):
                 self.assertEqual(
                     post._meta.get_field(field).verbose_name, expected_value
-                    )
+                )
         verbose_title = group._meta.get_field('title').verbose_name
         verbose_slug = group._meta.get_field('slug').verbose_name
         verbose_description = group._meta.get_field('description').verbose_name
@@ -52,7 +51,7 @@ class PostModelTest(TestCase):
             with self.subTest(field=field):
                 self.assertEqual(
                     group._meta.get_field(field).verbose_name, expected_value
-                    )
+                )
 
     def test_models_have_correct_help_text(self):
         """Проверяем, что help_text в полях совпадает с ожидаемым."""

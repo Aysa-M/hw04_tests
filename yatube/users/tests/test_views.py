@@ -5,6 +5,7 @@ from django import forms
 
 User = get_user_model()
 
+
 class UsersViewsTests(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -13,8 +14,10 @@ class UsersViewsTests(TestCase):
 
     def setUp(self) -> None:
         self.guest_client = Client()
-        self.authorized_client = Client({'username': 'Sunny',
-        'password': 'smile'})
+        self.authorized_client = Client({
+            'username': 'Sunny',
+            'password': 'smile'
+        })
         self.authorized_client.force_login(self.user)
 
     def test_views_users_names_namespace(self):
@@ -24,7 +27,8 @@ class UsersViewsTests(TestCase):
         """
         users_names_namespaces = {
             'users/signup.html': reverse('users:signup'),
-            'users/password_reset_form.html': reverse('users:password_reset_form')
+            'users/password_reset_form.html': reverse(
+                'users:password_reset_form')
         }
         for template, reverse_name in users_names_namespaces.items():
             with self.subTest(reverse_name=reverse_name):

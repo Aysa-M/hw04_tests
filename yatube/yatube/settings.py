@@ -137,3 +137,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 COUNT_PER_PAGE = 10
+
+ABSTRACT_CREATED_POST_FOR_TESTS = 1

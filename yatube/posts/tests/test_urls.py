@@ -21,7 +21,7 @@ class PostsURLTests(TestCase):
             author=cls.user,
             text='Тестовая группа',
         )
-    
+
     def setUp(self) -> None:
         self.guest_client = Client()
         self.authorized_client = Client()
@@ -38,14 +38,15 @@ class PostsURLTests(TestCase):
             '/profile/auth/',
             '/posts/1/',
             '/unexisting_page/',
-            ]
+        ]
         for address in url_names_guest:
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
                 if response.status_code == HTTPStatus.OK:
                     self.assertEqual(response.status_code, HTTPStatus.OK)
                 else:
-                    self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+                    self.assertEqual(
+                        response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_about_url_exists_at_desired_location_for_authorized(self):
         """
@@ -60,21 +61,25 @@ class PostsURLTests(TestCase):
             '/posts/1/edit/',
             '/create/',
             '/unexisting_page/',
-            ]
+        ]
         for address in url_names_authorized:
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 if response.status_code == HTTPStatus.OK:
                     self.assertEqual(response.status_code, HTTPStatus.OK)
                 else:
-                    self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+                    self.assertEqual(
+                        response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_edit_post_by_post_author(self):
         """
         Проверка доступности адреса редактирования поста для
         автора поста.
         """
-        response = self.authorized_client.get('/create/', args=[self.post.author])
+        response = self.authorized_client.get(
+            '/create/',
+            args=[self.post.author]
+        )
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_uses_correct_template(self):

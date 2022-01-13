@@ -1,4 +1,3 @@
-from django.http import response
 from django.test import TestCase, Client
 from http import HTTPStatus
 from django.urls import reverse
@@ -20,7 +19,8 @@ class AboutURLTests(TestCase):
                 if response.status_code == HTTPStatus.OK:
                     self.assertEqual(response.status_code, HTTPStatus.OK)
                 else:
-                    self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+                    self.assertEqual(
+                        response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_templates_about(self):
         """URL-адрес использует соответствующие шаблоны about."""

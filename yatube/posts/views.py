@@ -86,7 +86,7 @@ def post_create(request):
 @login_required
 def post_edit(request, post_id):
     """
-    This view edits the post by its id and saves changes in database.
+    The view edits the post by its id and saves changes in database.
     """
     post = get_object_or_404(Post, pk=post_id)
     author = post.author
