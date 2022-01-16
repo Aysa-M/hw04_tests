@@ -9,8 +9,7 @@ from .forms import (
     CreationForm,
     PasswordResetForm,
     PasswordChangeForm,
-    PasswordResetConfirmForm,
-    )
+    PasswordResetConfirmForm)
 
 
 class SignUp(CreateView):
