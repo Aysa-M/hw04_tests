@@ -8,6 +8,10 @@ User = get_user_model()
 
 
 class PostsURLTests(TestCase):
+    """
+    Класс для создания тестов для URL адресов
+    приложения posts.
+    """
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -18,47 +22,47 @@ class PostsURLTests(TestCase):
             description='Тестовое описание',
         )
         cls.post = Post.objects.create(
+            text='Текст тестового поста для URLs.',
             author=cls.user,
-            text='Тестовая группа',
+            group=cls.group,
         )
 
     def setUp(self) -> None:
-        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
-    def test_about_url_exists_at_desired_location_for_guest_client(self):
+    def test_posts_url_exists_at_desired_location_for_guest_client(self):
         """
         Проверка доступности адресов приложения posts для
         неавторизованных пользователей.
         """
         url_names_guest = [
             '/',
-            '/posts/group/test-slug/',
-            '/profile/auth/',
-            '/posts/1/',
+            '/posts/group/{slug}/'.format(slug=self.group.slug),
+            '/profile/{username}/'.format(username=self.user.username),
+            '/posts/{post_id}/'.format(post_id=self.post.pk),
             '/unexisting_page/',
         ]
         for address in url_names_guest:
             with self.subTest(address=address):
-                response = self.guest_client.get(address)
+                response = self.client.get(address)
                 if response.status_code == HTTPStatus.OK:
                     self.assertEqual(response.status_code, HTTPStatus.OK)
                 else:
                     self.assertEqual(
                         response.status_code, HTTPStatus.NOT_FOUND)
 
-    def test_about_url_exists_at_desired_location_for_authorized(self):
+    def test_posts_url_exists_at_desired_location_for_authorized_client(self):
         """
         Проверка доступности адресов приложения posts для
         авторизованных пользователей.
         """
         url_names_authorized = [
             '/',
-            '/posts/group/test-slug/',
-            '/profile/auth/',
-            '/posts/1/',
-            '/posts/1/edit/',
+            '/posts/group/{slug}/'.format(slug=self.group.slug),
+            '/profile/{username}/'.format(username=self.user.username),
+            '/posts/{post_id}/'.format(post_id=self.post.pk),
+            '/posts/{post_id}/edit/'.format(post_id=self.post.pk),
             '/create/',
             '/unexisting_page/',
         ]
@@ -86,11 +90,15 @@ class PostsURLTests(TestCase):
         """URL-адрес использует соответствующие шаблоны posts."""
         templates_url_names = {
             '/': 'posts/index.html',
-            '/group/test-slug/': 'posts/group_list.html',
-            '/profile/auth/': 'posts/profile.html',
-            '/posts/1/': 'posts/post_detail.html',
+            '/group/{slug}/'.format(
+                slug=self.group.slug): 'posts/group_list.html',
+            '/profile/{username}/'.format(
+                username=self.user.username): 'posts/profile.html',
+            '/posts/{post_id}/'.format(
+                post_id=self.post.pk): 'posts/post_detail.html',
             '/create/': 'posts/create_post.html',
-            '/posts/1/edit/': 'posts/create_post.html',
+            '/posts/{post_id}/edit/'.format(
+                post_id=self.post.pk): 'posts/create_post.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):

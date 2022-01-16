@@ -3,7 +3,7 @@ from django.db import models
 from .validators import validate_not_empty
 
 User = get_user_model()
-SYMBOLS_OF_POST = 15
+SYMBOLS = 15
 
 
 class Post(models.Model):
@@ -43,10 +43,10 @@ class Post(models.Model):
         Внутренний класс Meta для хранения метаданных
         класса Post.
         """
-        ordering = ['-pub_date']
+        ordering = ['-pub_date', '-pk']
 
     def __str__(self) -> str:
-        return self.text[:SYMBOLS_OF_POST]
+        return self.text[:SYMBOLS]
 
 
 class Group(models.Model):

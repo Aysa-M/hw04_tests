@@ -1,17 +1,15 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from http import HTTPStatus
 from django.urls import reverse
 
 
-class AboutURLTests(TestCase):
-    def setUp(self):
-        self.client = Client()
-
+class StaticURLTests(TestCase):
+    """Класс для создания тестов URL-адресов приложения about."""
     def test_urls_about(self):
+        """Проверка доступности URL-адресов приложения about."""
         url_about = [
             '/about/author/',
             '/about/tech/',
-            '/unexpected_page/',
         ]
         for address in url_about:
             with self.subTest(address=address):
@@ -35,9 +33,7 @@ class AboutURLTests(TestCase):
 
 
 class AboutViewsTests(TestCase):
-    def setUp(self):
-        self.client = Client()
-
+    """Класс для создания тестов View-функций приложения about."""
     def test_views_about_names_namespace(self):
         """
         Проверка правильности используемых name:namespaces

@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.conf import settings
+from django.core.paginator import Paginator
 
 from posts.models import Post, Group
 
 User = get_user_model()
-FIRST_PAGE_COUNT = 10
-SECOND_PAGE_COUNT = 3
+# Количество объектов на страницу выводилось в константу
+# в settings при создании paginator.
+count_per_page = settings.COUNT_PER_PAGE
 
 
 class PaginatorViewsTest(TestCase):
@@ -14,7 +17,6 @@ class PaginatorViewsTest(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
-        cls.user_second = User.objects.create_user(username='LordWeider')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -29,106 +31,107 @@ class PaginatorViewsTest(TestCase):
         for i in range(1, 14):
             cls.objs.append((
                 Post(
-                    pk=i,
                     author=cls.user,
                     group=cls.group,
-                    text='Тестовая группа.'
+                    text='Создание поста {i} для paginator.'.format(i=i)
                 )))
         cls.post_obj = Post.objects.bulk_create(cls.objs)
+        paginator = Paginator(
+            Post.objects.order_by('-pub_date'),
+            count_per_page)
+        page_second = paginator.get_page(2)
+        cls.page_second_obj = len(page_second.object_list)
 
     def setUp(self) -> None:
-        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.authorized_client_another = Client()
-        self.authorized_client_another.force_login(self.user_second)
 
     def test_first_page_index_contains_ten_records(self):
         """
-        Проверка паджинатора - вывод десяти постов на
-        первую страницу index.html.
+        Проверка паджинатора - вывод определнного количества
+        постов на первую страницу index.html.
         """
         if self.authorized_client:
             response = self.authorized_client.get(reverse(
                 'posts:index'))
             self.assertEqual(
-                len(response.context['page_obj']), FIRST_PAGE_COUNT)
+                len(response.context['page_obj']), count_per_page)
         else:
-            response = self.guest_client.get(
+            response = self.client.get(
                 reverse('posts:index'))
             self.assertEqual(
-                len(response.context['page_obj']), FIRST_PAGE_COUNT)
+                len(response.context['page_obj']), count_per_page)
 
     def test_second_page_index_contains_three_records(self):
         """
-        Проверка паджинатора - вывод последних трех постов на
+        Проверка паджинатора - вывод последних постов на
         вторую страницу index.html.
         """
         if self.authorized_client:
             response = self.authorized_client.get(
                 reverse('posts:index') + '?page=2')
             self.assertEqual(
-                len(response.context['page_obj']), SECOND_PAGE_COUNT)
+                len(response.context['page_obj']), self.page_second_obj)
         else:
-            response = self.guest_client.get(
+            response = self.client.get(
                 reverse('posts:index') + '?page=2')
             self.assertEqual(
-                len(response.context['page_obj']), SECOND_PAGE_COUNT)
+                len(response.context['page_obj']), self.page_second_obj)
 
     def test_first_page_group_list_contains_ten_records(self):
         """
-        Проверка паджинатора - вывод десяти постов на
-        первую страницу group_list.html.
+        Проверка паджинатора - вывод определнного количества
+        постов на первую страницу group_list.html.
         """
         if self.authorized_client:
             response = self.authorized_client.get(reverse(
                 'posts:group_list',
-                kwargs={'slug': 'test-slug'}))
+                kwargs={'slug': self.group.slug}))
             self.assertEqual(
-                len(response.context['page_obj']), FIRST_PAGE_COUNT)
+                len(response.context['page_obj']), count_per_page)
         else:
-            response = self.guest_client.get(reverse(
+            response = self.client.get(reverse(
                 'posts:group_list',
-                kwargs={'slug': 'test-slug'}))
+                kwargs={'slug': self.group.slug}))
             self.assertEqual(
-                len(response.context['page_obj']), FIRST_PAGE_COUNT)
+                len(response.context['page_obj']), count_per_page)
 
     def test_second_page_group_list_contains_three_records(self):
         """
-        Проверка паджинатора - вывод последних трех постов на
+        Проверка паджинатора - вывод последних постов на
         вторую страницу group_list.html.
         """
         if self.authorized_client:
             response = self.authorized_client.get((reverse(
                 'posts:group_list',
-                kwargs={'slug': 'test-slug'})) + '?page=2')
+                kwargs={'slug': self.group.slug})) + '?page=2')
             self.assertEqual(
-                len(response.context['page_obj']), SECOND_PAGE_COUNT)
+                len(response.context['page_obj']), self.page_second_obj)
         else:
-            response = self.guest_client.get((reverse(
+            response = self.client.get((reverse(
                 'posts:group_list',
-                kwargs={'slug': 'test-slug'})) + '?page=2')
+                kwargs={'slug': self.group.slug})) + '?page=2')
             self.assertEqual(
-                len(response.context['page_obj']), SECOND_PAGE_COUNT)
+                len(response.context['page_obj']), self.page_second_obj)
 
     def test_first_page_profile_contains_ten_records(self):
         """
-        Проверка паджинатора - вывод десяти постов на
-        первую страницу profile.html.
+        Проверка паджинатора - вывод определнного количества
+        постов на первую страницу profile.html.
         """
         response = self.authorized_client.get(reverse(
             'posts:profile',
-            kwargs={'username': 'auth'}))
+            kwargs={'username': self.user.username}))
         self.assertEqual(
-            len(response.context['page_obj']), FIRST_PAGE_COUNT)
+            len(response.context['page_obj']), count_per_page)
 
     def test_second_page_profile_contains_three_records(self):
         """
-        Проверка паджинатора - вывод последних трех постов на
+        Проверка паджинатора - вывод последних постов на
         вторую страницу group_list.html.
         """
         response = self.authorized_client.get((reverse(
             'posts:profile',
-            kwargs={'username': 'auth'})) + '?page=2')
+            kwargs={'username': self.user.username})) + '?page=2')
         self.assertEqual(
-            len(response.context['page_obj']), SECOND_PAGE_COUNT)
+            len(response.context['page_obj']), self.page_second_obj)
