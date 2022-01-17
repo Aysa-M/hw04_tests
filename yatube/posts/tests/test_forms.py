@@ -8,10 +8,7 @@ from posts.forms import PostForm
 from posts.models import Post, Group
 
 User = get_user_model()
-# Константа abstract_object используется в нескольких тестах разных
-# приложений для проверки создания объектов моделей
-# Post и User в базе данных.
-abstract_object = settings.ABSTRACT_CREATED_OBJECT_FOR_TESTS
+ABSTRACT_OBJECT = settings.ABSTRACT_CREATED_OBJECT_FOR_TESTS
 
 
 class PostsFormsTests(TestCase):
@@ -66,14 +63,11 @@ class PostsFormsTests(TestCase):
         )
         self.assertEqual(
             Post.objects.count(),
-            post_count + abstract_object)
+            post_count + ABSTRACT_OBJECT)
         ordered_posts = Post.objects.order_by('id')
         last_post = ordered_posts.last()
-        self.assertTrue((
-            Post.objects.filter(
-                text=last_post.text,
-                group=last_post.group
-            )).exists())
+        self.assertEqual(form_data['text'], last_post.text)
+        self.assertEqual(form_data['group'], last_post.group.pk)
 
     def test_form_posts_edit_post(self):
         """
@@ -99,12 +93,6 @@ class PostsFormsTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count)
         edited_post = Post.objects.get(id=self.post.pk)
-        self.assertTrue((
-            Post.objects.filter(
-                id=self.post.pk,
-                text=edited_post.text,
-                group=edited_post.group,
-            )).exists())
         self.assertEqual(form_data_edit['text'],
                          edited_post.text)
         self.assertEqual(form_data_edit['group'],

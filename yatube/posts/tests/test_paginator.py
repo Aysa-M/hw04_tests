@@ -9,7 +9,7 @@ from posts.models import Post, Group
 User = get_user_model()
 # Количество объектов на страницу выводилось в константу
 # в settings при создании paginator.
-count_per_page = settings.COUNT_PER_PAGE
+COUNT_PER_PAGE = settings.COUNT_PER_PAGE
 
 
 class PaginatorViewsTest(TestCase):
@@ -38,7 +38,7 @@ class PaginatorViewsTest(TestCase):
         cls.post_obj = Post.objects.bulk_create(cls.objs)
         paginator = Paginator(
             Post.objects.order_by('-pub_date'),
-            count_per_page)
+            COUNT_PER_PAGE)
         page_second = paginator.get_page(2)
         cls.page_second_obj = len(page_second.object_list)
 
@@ -55,12 +55,12 @@ class PaginatorViewsTest(TestCase):
             response = self.authorized_client.get(reverse(
                 'posts:index'))
             self.assertEqual(
-                len(response.context['page_obj']), count_per_page)
+                len(response.context['page_obj']), COUNT_PER_PAGE)
         else:
             response = self.client.get(
                 reverse('posts:index'))
             self.assertEqual(
-                len(response.context['page_obj']), count_per_page)
+                len(response.context['page_obj']), COUNT_PER_PAGE)
 
     def test_second_page_index_contains_three_records(self):
         """
@@ -88,13 +88,13 @@ class PaginatorViewsTest(TestCase):
                 'posts:group_list',
                 kwargs={'slug': self.group.slug}))
             self.assertEqual(
-                len(response.context['page_obj']), count_per_page)
+                len(response.context['page_obj']), COUNT_PER_PAGE)
         else:
             response = self.client.get(reverse(
                 'posts:group_list',
                 kwargs={'slug': self.group.slug}))
             self.assertEqual(
-                len(response.context['page_obj']), count_per_page)
+                len(response.context['page_obj']), COUNT_PER_PAGE)
 
     def test_second_page_group_list_contains_three_records(self):
         """
@@ -123,7 +123,7 @@ class PaginatorViewsTest(TestCase):
             'posts:profile',
             kwargs={'username': self.user.username}))
         self.assertEqual(
-            len(response.context['page_obj']), count_per_page)
+            len(response.context['page_obj']), COUNT_PER_PAGE)
 
     def test_second_page_profile_contains_three_records(self):
         """
