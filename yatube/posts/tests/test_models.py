@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.conf import settings
 
 from posts.models import Group, Post
 
 User = get_user_model()
+SYMBOLS = settings.SYMBOLS_FOR_TEXT_POST_STR
 
 
 class PostModelTest(TestCase):
@@ -22,42 +24,24 @@ class PostModelTest(TestCase):
             group=cls.group,
         )
 
-    def test_post_models_have_correct_object_names(self):
-        """Проверяем, что у моделей Post корректно работает __str__."""
-        verbose_author = self.post._meta.get_field('author').verbose_name
-        verbose_text = self.post._meta.get_field('text').verbose_name
-        verbose_pub_date = self.post._meta.get_field('pub_date').verbose_name
-        verbose_group = self.post._meta.get_field('group').verbose_name
-        post_field_verboses = {
-            'author': verbose_author,
-            'text': verbose_text,
-            'pub_date': verbose_pub_date,
-            'group': verbose_group,
-        }
-        for field, expected_value in post_field_verboses.items():
-            with self.subTest(field=field):
-                self.assertEqual(
-                    self.post._meta.get_field(field).verbose_name,
-                    expected_value
-                )
+    def test_post_models_method_str(self):
+        """
+        Проверяем, что у моделей Post корректно работает
+        метод __str__. __str__  post - это строчка с содержимым
+        post.text[:15].
+        """
+        test_model_post = PostModelTest.post
+        expected_value = test_model_post.text[:SYMBOLS]
+        self.assertEqual(expected_value, str(test_model_post))
 
-    def test_group_models_have_correct_object_names(self):
-        """Проверяем, что у модели Group корректно работает __str__."""
-        verbose_title = self.group._meta.get_field('title').verbose_name
-        verbose_slug = self.group._meta.get_field('slug').verbose_name
-        verbose_description = self.group._meta.get_field(
-            'description').verbose_name
-        group_field_verboses = {
-            'title': verbose_title,
-            'slug': verbose_slug,
-            'description': verbose_description,
-        }
-        for field, expected_value in group_field_verboses.items():
-            with self.subTest(field=field):
-                self.assertEqual(
-                    self.group._meta.get_field(field).verbose_name,
-                    expected_value
-                )
+    def test_group_models_str(self):
+        """
+        Проверяем, что у модели Group корректно работает метод __str__.
+        __str__  group - это строчка с содержимым group.title.
+        """
+        test_model_group = PostModelTest.group
+        expected_value = test_model_group.title
+        self.assertEqual(expected_value, str(test_model_group))
 
     def test_models_have_correct_help_text(self):
         """Проверяем, что help_text в полях совпадает с ожидаемым."""

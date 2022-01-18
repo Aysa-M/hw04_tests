@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from .validators import validate_not_empty
+from django.conf import settings
 
 User = get_user_model()
-SYMBOLS = 15
+SYMBOLS = settings.SYMBOLS_FOR_TEXT_POST_STR
 
 
 class Post(models.Model):

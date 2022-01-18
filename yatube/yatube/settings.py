@@ -25,7 +25,12 @@ SECRET_KEY = '=ay%q#$u*&54!btl5-e-sitr)_x8d$(qo5kkrzl7_+t(fpivfo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    'testserver',
+]
 
 
 # Application definition
@@ -40,7 +45,7 @@ INSTALLED_APPS = [
     'posts.apps.PostsConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
-    'about.apps.AboutConfig'
+    'about.apps.AboutConfig',
 ]
 
 MIDDLEWARE = [
@@ -136,6 +141,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
+
 COUNT_PER_PAGE = 10
 
 ABSTRACT_CREATED_OBJECT_FOR_TESTS = 1
+
+SYMBOLS_FOR_TEXT_POST_STR = 15
